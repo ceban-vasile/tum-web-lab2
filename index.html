@@ -12,8 +12,8 @@
     <nav>
       <ul>
         <li><a href="#hero">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#cars">Our Cars</a></li>
+        <li><a href="#about-section">About</a></li>
+        <li><a href="#card">Our Cars</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -22,36 +22,47 @@
   <section id="hero">
     <h1>Welcome to Speedy Rentals</h1>
     <p>Experience the freedom of the open road with our premium rental cars!</p>
-    <a href="#cars" class="cta">View Our Cars</a>
+    <a href="#card" class="cta">View Our Cars</a>
   </section>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>
-      At Speedy Rentals, we pride ourselves on offering fast, affordable, and reliable car rental services for every occasion. Whether you’re on a business trip or a leisurely vacation, our diverse fleet has something to meet your needs.
-    </p>
-  </section>
+  <div class="about-section">
+    <h1>About Us Page</h1>
+    <p>Some text about who we are and what we do.</p>
+    <p>Resize the browser window to see that this page is responsive by the way.</p>
+  </div>
 
-  <section id="cars">
-    <h2>Our Fleet</h2>
-    <div class="car-list">
-      <div class="car">
-        <img src="images/sedan.jpg" alt="Sedan" />
-        <h3>Sedan</h3>
+  <h2 style="text-align:center">Our Fleet</h2>
+<div class="row">
+  <div class="column">
+    <div class="card">
+      <img src="images/sedan.jpg" alt="Jane" style="width:100%">
+      <div class="container">
+        <h2>Sedan</h2>
         <p>Comfortable and fuel-efficient for city drives.</p>
       </div>
-      <div class="car">
-        <img src="images/suv.jpg" alt="SUV" />
-        <h3>SUV</h3>
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="card">
+      <img src="images/suv.jpg" alt="Mike" style="width:100%">
+      <div class="container">
+        <h2>SUV</h2>
         <p>Spacious and powerful for family trips.</p>
       </div>
-      <div class="car">
-        <img src="images/convertible.jpg" alt="Convertible" />
-        <h3>Convertible</h3>
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="card">
+      <img src="images/convertible.jpg" alt="John" style="width:100%">
+      <div class="container">
+        <h2>Convertible</h2>
         <p>Stylish rides perfect for sunny adventures.</p>
       </div>
     </div>
-  </section>
+  </div>
+</div>
 
   <section id="contact">
     <h2>Contact Us</h2>
