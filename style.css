@@ -149,3 +149,80 @@ footer {
   color: white;
   padding: 10px;
 }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  nav ul li {
+    margin: 10px 0;
+  }
+
+  #hero {
+    height: 300px;
+    padding: 20px;
+  }
+
+  #hero h1 {
+    font-size: 24px;
+  }
+
+  .cta {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+
+  .car-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .car {
+    width: 90%;
+  }
+
+  form {
+    width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  #hero {
+    height: 250px;
+  }
+
+  #hero h1 {
+    font-size: 20px;
+  }
+
+  .cta {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  #about-section h1,
+  #fleet h2,
+  #contact h2 {
+    font-size: 24px;
+  }
+
+  #about-section p,
+  .car p {
+    font-size: 16px;
+  }
+
+  input,
+  textarea {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+}
