@@ -150,7 +150,6 @@ footer {
   padding: 10px;
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;
@@ -224,5 +223,17 @@ footer {
   button {
     font-size: 16px;
     padding: 8px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block; 
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none;
   }
 }
