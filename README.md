@@ -1,22 +1,33 @@
-# Lab 2 - Landing page
+# Speedy Rentals - Car Rental Service 🚗
 
-Create a web page for your/friends/relatives business (example: car-rent, cookies-shop, crypto-scam)
+A responsive landing page for **Speedy Rentals**, a car rental service offering a wide range of premium vehicles. The page is built using **HTML** and **CSS** only, ensuring a fast and lightweight experience.
 
-## Customer requirements
+## 🚀 Live Demo
+Check out the live version here: [Live Demo](https://tum-web-lab2-topaz.vercel.app/)
 
-- Some form of navigation to sections (links, buttons)
-- Call to action
-- At least 4 sections ([see examples](https://webflow.com/blog/high-converting-landing-page))
-- Pleasant to the eyes
+## 📸 Screenshots
+![alt text](Screenshot_4.png)
 
-## Dev requirements
+![alt text](Screenshot_5.png)
 
-- Use vanilla CSS and HTML (no frameworks)
-- Have a decent git history (no one commit)
-- The page should be deployed on a free hosting service (example: GitHub Pages, Vercel, Netlify)
-- Project repo should have a README with a short description of the landing page topic, screenshots, and a link to the live demo
+## 📌 Features
+- Fully **responsive** design for all screen sizes.
+- **Clean and modern UI** with a focus on usability.
+- **Hero section** with a call-to-action.
+- **Car fleet showcase** with images and descriptions.
+- **Contact form** for customer inquiries.
+- **Fixed mascot helper** for assistance.
 
-## Other requirements:
+## 📁 Project Structure
+```bash
+/project-root
+│── /images       # Images used in the website
+│── index.html    # Main HTML file
+│── style.css     # Stylesheet for the page
+│── reset.css     # Reset CSS for consistent styling
+│── README.md     # Project documentation 
+```
 
-- For potential maximal mark, a WIP version should be submitted during the class
-- Use index.html, reset.css
+---
+**Author:** Ceban Vasile  
+**Group:** FAF-223
