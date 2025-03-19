@@ -3,6 +3,37 @@ import argparse
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin
 
+class HTMLStripper(HTMLParser):
+    """HTML Parser to strip HTML tags and extract text and links"""
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs = True
+        self.text = []
+        self.links = []
+        self.current_link = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs_dict = dict(attrs)
+        if tag == 'a' and 'href' in attrs_dict:
+            self.current_link = attrs_dict['href']
+    
+    def handle_endtag(self, tag):
+        if tag == 'a' and self.current_link:
+            self.current_link = None
+    
+    def handle_data(self, data):
+        if data.strip():
+            self.text.append(data.strip())
+            if self.current_link:
+                self.links.append((data.strip(), self.current_link))
+    
+    def get_text(self):
+        return '\n'.join(self.text)
+    
+    def get_links(self):
+        return self.links
 
 def parse_args():
     """Parse command line arguments"""
@@ -17,6 +48,10 @@ def parse_args():
 def main():
     """Main function"""
     args = parse_args()
+    
+    if args.url:
+        result = make_http_request(args.url, not args.no_cache)
+        print(result)
 
 
 if __name__ == "__main__":
