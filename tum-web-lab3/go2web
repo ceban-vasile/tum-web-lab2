@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+import argparse
+from html.parser import HTMLParser
+from urllib.parse import urlparse, urljoin
+
+
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='CLI for making HTTP requests')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-u', '--url', help='Make an HTTP request to the specified URL')
+    group.add_argument('-s', '--search', nargs='+', help='Search term using a search engine')
+    parser.add_argument('-n', '--no-cache', action='store_true', help='Disable cache')
+    
+    return parser.parse_args()
+
+def main():
+    """Main function"""
+    args = parse_args()
+
+
+if __name__ == "__main__":
+    main()
