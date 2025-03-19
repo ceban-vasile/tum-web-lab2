@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
+import socket
+import os
 import argparse
+import re
+import json
+import time
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin
+
+CACHE_DIR = os.path.join(os.path.expanduser("~"), ".go2web_cache")
+CACHE_EXPIRY = 3600 
 
 class HTMLStripper(HTMLParser):
     """HTML Parser to strip HTML tags and extract text and links"""
@@ -44,6 +52,154 @@ def parse_args():
     parser.add_argument('-n', '--no-cache', action='store_true', help='Disable cache')
     
     return parser.parse_args()
+
+def prepare_request(host, path, headers=None):
+    """Prepare an HTTP request"""
+    if headers is None:
+        headers = {}
+    
+    # Set default headers if not provided
+    if 'User-Agent' not in headers:
+        headers['User-Agent'] = 'go2web/1.0'
+    if 'Accept' not in headers:
+        headers['Accept'] = 'text/html, application/json'
+    if 'Connection' not in headers:
+        headers['Connection'] = 'close'
+    
+    request = f"GET {path} HTTP/1.1\r\n"
+    request += f"Host: {host}\r\n"
+    
+    # Add headers
+    for key, value in headers.items():
+        request += f"{key}: {value}\r\n"
+    
+    request += "\r\n"
+    return request
+
+
+def get_from_cache(url):
+    """Try to get response from cache"""
+    if not os.path.exists(CACHE_DIR):
+        return None
+    
+    cache_file = os.path.join(CACHE_DIR, re.sub(r'[^\w]', '_', url))
+    
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r') as f:
+            try:
+                cache_data = json.load(f)
+                if time.time() - cache_data.get('timestamp', 0) < CACHE_EXPIRY:
+                    return cache_data.get('response')
+            except:
+                pass
+    
+    return None
+
+
+def save_to_cache(url, response):
+    """Save response to cache"""
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+    
+    cache_file = os.path.join(CACHE_DIR, re.sub(r'[^\w]', '_', url))
+    
+    cache_data = {
+        'timestamp': time.time(),
+        'response': response
+    }
+    
+    with open(cache_file, 'w') as f:
+        json.dump(cache_data, f)
+
+def make_http_request(url, use_cache=True):
+    """Make an HTTP request to the specified URL"""
+    if use_cache:
+        cached_response = get_from_cache(url)
+        if cached_response:
+            return cached_response
+    
+    parsed_url = urlparse(url)
+    
+    if not parsed_url.scheme:
+        parsed_url = urlparse(f"http://{url}")
+    
+    path = parsed_url.path or '/'
+    if parsed_url.query:
+        path += f"?{parsed_url.query}"
+    
+    host = parsed_url.netloc
+    port = 80
+    
+    if ':' in host:
+        host, port_str = host.split(':')
+        port = int(port_str)
+    elif parsed_url.scheme == 'https':
+        port = 443
+    
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    try:
+        s.connect((host, port))
+        
+        request = prepare_request(host, path)
+        s.sendall(request.encode())
+        
+        response = b''
+        while True:
+            data = s.recv(4096)
+            if not data:
+                break
+            response += data
+        
+        s.close()
+        
+        response_str = response.decode('utf-8', errors='replace')
+        
+        # Split headers and body
+        headers_end = response_str.find('\r\n\r\n')
+        if headers_end == -1:
+            return "Invalid response from server"
+        
+        headers_str = response_str[:headers_end]
+        body = response_str[headers_end + 4:]
+        
+        status_line = headers_str.split('\r\n')[0]
+        status_match = re.search(r'HTTP/\d\.\d (\d+)', status_line)
+        
+        if status_match:
+            status_code = int(status_match.group(1))
+            if status_code in (301, 302, 303, 307, 308):
+                location_match = re.search(r'Location: (.+)\r\n', headers_str)
+                if location_match:
+                    redirect_url = location_match.group(1).strip()
+                    
+                    if not redirect_url.startswith(('http://', 'https://')):
+                        redirect_url = urljoin(url, redirect_url)
+                    
+                    print(f"Redirecting to: {redirect_url}")
+                    return make_http_request(redirect_url, use_cache)
+        
+        content_type_match = re.search(r'Content-Type: (.+)\r\n', headers_str)
+        content_type = content_type_match.group(1) if content_type_match else ''
+        
+        if 'application/json' in content_type:
+            try:
+                parsed_body = json.loads(body)
+                formatted_response = json.dumps(parsed_body, indent=2)
+            except json.JSONDecodeError:
+                formatted_response = body
+        else:
+            stripper = HTMLStripper()
+            stripper.feed(body)
+            formatted_response = stripper.get_text()
+            
+        if use_cache:
+            save_to_cache(url, formatted_response)
+        
+        return formatted_response
+    
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def main():
     """Main function"""
