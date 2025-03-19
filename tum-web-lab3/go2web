@@ -200,6 +200,74 @@ def make_http_request(url, use_cache=True):
     
     except Exception as e:
         return f"Error: {str(e)}"
+    
+def search_google(query, use_cache=True):
+    """Search Google and return the top 10 results"""
+    search_terms = '+'.join(query)
+    url = f"https://www.google.com/search?q={search_terms}"
+    
+    cached_response = None
+    if use_cache:
+        cached_response = get_from_cache(url)
+    
+    if cached_response:
+        results = cached_response
+    else:
+        # Create a socket
+        parsed_url = urlparse(url)
+        host = parsed_url.netloc
+        path = parsed_url.path + '?' + parsed_url.query
+        
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        try:
+            s.connect((host, 80))
+            
+            request = prepare_request(host, path)
+            s.sendall(request.encode())
+            
+            response = b''
+            while True:
+                data = s.recv(4096)
+                if not data:
+                    break
+                response += data
+            
+            s.close()
+            
+            response_str = response.decode('utf-8', errors='replace')
+            
+            # Extract body
+            headers_end = response_str.find('\r\n\r\n')
+            if headers_end == -1:
+                return "Invalid response from server"
+            
+            body = response_str[headers_end + 4:]
+            
+            stripper = HTMLStripper()
+            stripper.feed(body)
+            links = stripper.get_links()
+            
+            results = []
+            count = 0
+            
+            for text, link in links:
+                if count >= 10:
+                    break
+                
+                if not link.startswith('/'):
+                    results.append(f"{count + 1}. {text}: {link}")
+                    count += 1
+            
+            results = '\n'.join(results)
+            
+            if use_cache:
+                save_to_cache(url, results)
+        
+        except Exception as e:
+            results = f"Error: {str(e)}"
+    
+    return results
 
 def main():
     """Main function"""
@@ -207,6 +275,9 @@ def main():
     
     if args.url:
         result = make_http_request(args.url, not args.no_cache)
+        print(result)
+    elif args.search:
+        result = search_google(args.search, not args.no_cache)
         print(result)
 
 
